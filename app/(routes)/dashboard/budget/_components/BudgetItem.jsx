@@ -1,8 +1,17 @@
+import Link from "next/link";
 import React from "react";
 
 function BudgetItem({ budgetI }) {
+  const calculateProgress = () => {
+    const perc = (budgetI.totalSpend / budgetI.amount) * 100;
+    return perc.toFixed(2);
+  };
+
   return (
-    <div className="p-5 border rounded-lg hover:shadow-md cursor-pointer">
+    <Link
+      href={"/dashboard/expenses/" + budgetI?.id}
+      className="p-5 border rounded-lg hover:shadow-md cursor-pointer h-[170px]"
+    >
       <div className="flex gap-2 items-center justify-between">
         <div className="flex gap-2 items-center">
           <h2 className="text-2xl px-4 p-3 bg-slate-100 rounded-full">
@@ -27,10 +36,13 @@ function BudgetItem({ budgetI }) {
           </h2>
         </div>
         <div className="w-full bg-slate-300 h-2 rounded-full">
-          <div className="w-[40%] bg-primary h-2 rounded-full"></div>
+          <div
+            className="bg-primary h-2 rounded-full"
+            style={{ width: `${calculateProgress()}%` }}
+          ></div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
