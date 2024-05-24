@@ -20,18 +20,6 @@ function SideNav() {
       icon: PiggyBank,
       path: "/dashboard/budget",
     },
-    {
-      id: 3,
-      name: "Expenses",
-      icon: ReceiptText,
-      path: "/dashboard/expenses",
-    },
-    {
-      id: 4,
-      name: "Upgrade",
-      icon: ShieldCheck,
-      path: "/dashboard/upgrade",
-    },
   ];
 
   const path = usePathname();
@@ -40,7 +28,9 @@ function SideNav() {
   }, [path]);
   return (
     <div className="h-screen p-5 border shadow-sm">
-      <Image src={"/logo.svg"} width={160} height={100} alt="logo" />
+      <Link href={"/"}>
+        <Image src={"/logo.png"} width={160} height={100} alt="logo" />
+      </Link>
       <div className="mt-5">
         {menuList.map((menu) => (
           <Link href={menu.path} key={menu.id}>

@@ -10,11 +10,11 @@ function Header() {
   const { user, isSignedIn } = useUser();
   return (
     <div className="p-5 flex justify-between items-center border shadow-sm">
-      <Image src={"./logo.svg"} alt="logo" height={100} width={160} />
+      <Image src={"/logo.png"} alt="logo" height={80} width={120} />
       {isSignedIn ? (
         <UserButton />
       ) : (
-        <Link href={'/sign-in'}>
+        <Link href={"/sign-in"}>
           <Button>Get Started</Button>
         </Link>
       )}
