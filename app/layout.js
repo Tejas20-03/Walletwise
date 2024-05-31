@@ -2,7 +2,7 @@ import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
-import favicon from "/logo.png";
+import favicon from "./public/logo.png";
 
 const outfit = Outfit({ subsets: ["latin"] });
 
