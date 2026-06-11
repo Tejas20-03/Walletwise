@@ -1,42 +1,18 @@
-"use client";
-
-import React, { useEffect } from "react";
 import SideNav from "./_components/SideNav";
 import DashboardHeader from "./_components/DashboardHeader";
-import { db } from "@/utils/dbConfig";
-import { Budgets } from "@/utils/schema";
-import { useUser } from "@clerk/nextjs";
-import { eq } from "drizzle-orm";
-import { useRouter } from "next/navigation";
+import MobileNav from "./_components/MobileNav";
 
-function DashboardLayout({ children }) {
-  const router = useRouter();
-  const { user } = useUser();
-  useEffect(() => {
-    user && checkUserBudgets();
-  }, [user]);
-  const checkUserBudgets = async () => {
-    const result = await db
-      .select()
-      .from(Budgets)
-      .where(eq(Budgets.createdBy, user?.primaryEmailAddress?.emailAddress));
-    console.log(result);
-    if (result?.length == 0) {
-      router.replace("/dashboard/budget");
-    }
-  };
+export default function DashboardLayout({ children }) {
   return (
-    <div>
-      <div className="fixed md:w-64 hidden md:block">
+    <div className="min-h-screen bg-slate-50">
+      <div className="fixed md:w-64 hidden md:block top-0 left-0 bottom-0 z-50">
         <SideNav />
       </div>
-
-      <div className="md:ml-64">
+      <div className="md:ml-64 pb-16 md:pb-0">
         <DashboardHeader />
         {children}
       </div>
+      <MobileNav />
     </div>
   );
 }
-
-export default DashboardLayout;
