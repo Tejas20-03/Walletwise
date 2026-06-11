@@ -11,13 +11,20 @@ async function getUserEmail() {
   return user.primaryEmailAddress?.emailAddress;
 }
 
+// Returns "MM/YYYY" for the current month — used to scope spend to the current billing period
+function thisMonth() {
+  const now = new Date();
+  return `${String(now.getMonth() + 1).padStart(2, "0")}/${now.getFullYear()}`;
+}
+
 export async function getBudgetList() {
   const email = await getUserEmail();
+  const month = thisMonth();
   return db
     .select({
       ...getTableColumns(Budgets),
-      totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number),
-      totalItem: sql`count(${Expenses.id})`.mapWith(Number),
+      totalSpend: sql`COALESCE(sum(CASE WHEN SUBSTRING(${Expenses.createdAt}, 4, 7) = ${month} THEN ${Expenses.amount} ELSE 0 END), 0)`.mapWith(Number),
+      totalItem: sql`COUNT(CASE WHEN SUBSTRING(${Expenses.createdAt}, 4, 7) = ${month} THEN 1 END)`.mapWith(Number),
     })
     .from(Budgets)
     .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
@@ -28,11 +35,12 @@ export async function getBudgetList() {
 
 export async function getBudgetById(budgetId) {
   const email = await getUserEmail();
+  const month = thisMonth();
   const result = await db
     .select({
       ...getTableColumns(Budgets),
-      totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number),
-      totalItem: sql`count(${Expenses.id})`.mapWith(Number),
+      totalSpend: sql`COALESCE(sum(CASE WHEN SUBSTRING(${Expenses.createdAt}, 4, 7) = ${month} THEN ${Expenses.amount} ELSE 0 END), 0)`.mapWith(Number),
+      totalItem: sql`COUNT(CASE WHEN SUBSTRING(${Expenses.createdAt}, 4, 7) = ${month} THEN 1 END)`.mapWith(Number),
     })
     .from(Budgets)
     .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
@@ -41,15 +49,15 @@ export async function getBudgetById(budgetId) {
   return result[0] ?? null;
 }
 
-export async function createBudget({ name, amount }) {
+export async function createBudget({ name, amount, category }) {
   const email = await getUserEmail();
   return db
     .insert(Budgets)
-    .values({ name, amount, createdBy: email })
+    .values({ name, amount, category: category ?? "other", createdBy: email })
     .returning({ insertId: Budgets.id });
 }
 
-export async function updateBudget(budgetId, { name, amount }) {
+export async function updateBudget(budgetId, { name, amount, category }) {
   const email = await getUserEmail();
   const [owned] = await db
     .select({ id: Budgets.id })
@@ -58,7 +66,7 @@ export async function updateBudget(budgetId, { name, amount }) {
   if (!owned) throw new Error("Unauthorized");
   return db
     .update(Budgets)
-    .set({ name, amount })
+    .set({ name, amount, category })
     .where(eq(Budgets.id, budgetId))
     .returning();
 }

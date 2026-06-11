@@ -11,6 +11,7 @@ export const Budgets = pgTable("budgets", {
   name: varchar("name").notNull(),
   amount: varchar("amount").notNull(),
   icon: varchar("icon"),
+  category: varchar("category").default("other"),
   createdBy: varchar("createdBy").notNull(),
 });
 
